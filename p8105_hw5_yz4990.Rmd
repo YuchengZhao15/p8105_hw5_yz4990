@@ -7,18 +7,51 @@ output: github_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
-library(rvest)
-library(readxl)
+#library(rvest)
+
 
 
 ```
 
 ## Problem 1
+function to check for same birthdays
 ```{r}
-
-
+birthday_check = function(group_size) {
+  birthdays <- sample(1:365, size = group_size, replace = TRUE)
+  duplicate = duplicated(birthdays)
+  
+  for (x in duplicate) {
+    if (x == TRUE) {
+      return(TRUE)
+    }
+  }
+  return(FALSE)
+}
 ```
 
+1000 simulations and plot
+```{r}
+sim_1000 = 
+  expand_grid(
+    iter = 1:1000, 
+    group_size = 2:50
+  ) |> 
+  mutate(
+    same_birthday = map_lgl(group_size, \(x) birthday_check(x))
+  ) |> 
+  group_by(group_size) |> 
+  summarize(prob = mean(same_birthday))
+  
+  sim_1000 |> 
+  ggplot(aes(x = group_size, y = prob)) +
+  geom_point() + 
+  labs(
+    title = "Group Size vs. Probability of Having Same Birthday",
+    x = "Group Size",
+    y = "Probability"
+  ) +
+  theme_minimal()
+```
 
 
 ## Problem 2
@@ -190,10 +223,7 @@ cities_test = homi_df |>
 
 
 
-```{r}
 
-
-```
 
 
 

@@ -6,7 +6,11 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(tidyverse)
+library(rvest)
+library(readxl)
 
+set.seed(1)
 ```
 
 ## Problem 1
@@ -17,8 +21,28 @@ output: html_document
 
 
 
-
+## Problem 2
 ```{r}
+n = 30
+sd = 5
+mu = 0
+
+sim_t_test = function(n = 30, mu, sd = 5, num_sim) {
+  sim_data = expand_grid(
+    iter = 1:num_sim,
+    sample_size = n
+  ) |> 
+    mutate(
+      x_df = map(sample_size, \(x) tibble(rnorm(x, mu, sd))), 
+      t_test = map(x_df, \(x) broom::tidy(t.test(x)))
+    ) |> 
+    unnest(t_test)
+  
+  return(sim_data)
+}
+
+sim_5000 = sim_t_test(n = 30, mu = 0, sd = 5, num_sim = 5000)
+
 
 
 ```
@@ -27,7 +51,6 @@ output: html_document
 
 
 ```{r}
-
 
 ```
 

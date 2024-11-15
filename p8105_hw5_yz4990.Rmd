@@ -145,22 +145,39 @@ baltimore_test = prop.test(
 ) |> 
   broom::tidy() |> 
   select(estimate, conf.low, conf.high)
-
-cities_test = prop.test(
-  pull(homi_df, unsolved),
-  pull(homi_df, total_homi)
-)
-  
-
 ```
 
-
-
-
+proportion test for all cities and plots
 ```{r}
+cities_test = homi_df |> 
+  mutate(
+    prop_test = map2(unsolved, total_homi, \(x, y) prop.test(x, y) |> 
+                       broom::tidy())
+  ) |> 
+  unnest(prop_test) |> 
+  select(city_state, estimate, conf.low, conf.high)
 
+  cities_test |> 
+    mutate(city_state = forcats::fct_reorder(city_state, estimate)) |> 
+    ggplot(aes(x = city_state, y = estimate)) +
+    geom_point() +
+    geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
+    theme_minimal() +
+  labs(
+    title = "Estimated Proportion of Unsolved Homicides in Cities with 95% CI",
+    x = "City",
+    y = "Proportion"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1)
+  )
 
 ```
+
+
+
+
+
 
 
 

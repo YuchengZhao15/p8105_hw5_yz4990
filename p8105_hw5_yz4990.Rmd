@@ -113,17 +113,44 @@ sim_results |>
 The average estimated mean of the rejected is closer or approximately equal to the true mean when the true mean is large, and it deviates from the true mean when the true mean is small. This is because there are more cases where the null hypothesis mu = 0 is rejected as the true mean increases.
 
 
-
+## Problem 3
 ```{r}
-
+homi_df = read_csv("./data/homicide-data.csv", 
+                   na = c("NA", "Unknown", ""), 
+                   ) |> 
+  janitor::clean_names()
 
 ```
 
+The raw data has `r ncol(homi_df)` columns X `r nrow(homi_df)` rows.  The variables are `r colnames(homi_df)`. There are some missing values in the raw data, noted as "Unknown" or an empty space. 
 
-
-
+proportion test for Baltimore
 ```{r}
+homi_df = homi_df |> 
+  mutate(
+    city_state = paste(city, state, sep = ", ")
+    ) |> 
+  group_by(city_state) |> 
+  summarize(
+    total_homi = n(),
+    unsolved = sum(disposition %in% c("Closed without arrest", "Open/No arrest"))
+  )
 
+baltimore_df = homi_df |> 
+  filter(city_state == "Baltimore, MD")
+
+baltimore_test = prop.test(
+  pull(baltimore_df, unsolved), 
+  pull(baltimore_df, total_homi)
+) |> 
+  broom::tidy() |> 
+  select(estimate, conf.low, conf.high)
+
+cities_test = prop.test(
+  pull(homi_df, unsolved),
+  pull(homi_df, total_homi)
+)
+  
 
 ```
 

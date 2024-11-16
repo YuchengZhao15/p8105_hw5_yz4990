@@ -78,7 +78,7 @@ sim_t_test = function(n = 30, mu, sd = 5, num_sim = 5000) {
 sim_5000 = sim_t_test(n = 30, mu = 0, sd = 5, num_sim = 5000) |> 
   select(estimate, p.value)
 
-
+sim_5000
 
 ```
 
@@ -178,6 +178,8 @@ baltimore_test = prop.test(
 ) |> 
   broom::tidy() |> 
   select(estimate, conf.low, conf.high)
+
+baltimore_test
 ```
 
 proportion test for all cities and plots
